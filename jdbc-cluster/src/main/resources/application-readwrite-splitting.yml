@@ -1,0 +1,76 @@
+server:
+  port: 8888
+# 应用名称
+spring:
+  application:
+    name: jdbc-cluster
+  # 开发环境设置
+  profiles:
+    active: dev
+  # 模式配置
+  shardingsphere:
+    mode:
+      type: Cluster
+      repository:
+        type: ZooKeeper
+        props:
+          namespace: governance
+          server-lists: localhost:6181
+          retryIntervalMilliseconds: 500
+          timeToLiveSeconds: 60
+    datasource:
+      # 真实数据源名称，多个数据源用逗号区分
+      names: master,slave1,slave2
+      master:
+        # 数据库连接池全类名
+        type: com.zaxxer.hikari.HikariDataSource
+        # 数据库驱动类名，以数据库连接池自身配置为准
+        driver-class-name: com.mysql.jdbc.Driver
+        # 数据库 URL 连接，以数据库连接池自身配置为准
+        jdbc-url: jdbc:mysql://192.168.218.142:3306/db_user
+        # 数据库用户名，以数据库连接池自身配置为准
+        username: root
+        # 数据库密码，以数据库连接池自身配置为准
+        password: 123456
+      slave1:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        jdbc-url: jdbc:mysql://192.168.218.142:3307/db_user
+        username: root
+        password: 123456
+      slave2:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        jdbc-url: jdbc:mysql://192.168.218.142:3308/db_user
+        username: root
+        password: 123456
+    rules:
+      readwrite-splitting:
+        data-sources:
+          readwrite_ds:
+            # 静态读写分离(static-strategy)
+            static-strategy:
+              # 写库数据源名称
+              write-data-source-name: master
+              # 读库数据源列表，多个从数据源用逗号分隔
+              read-data-source-names: slave1,slave2
+            # 负载均衡算法名称
+            load-balancer-name: alg_round_robin
+        # 负载均衡算法配置
+        load-balancers:
+          alg_weight:
+            # 负载均衡算法类型
+            type: WEIGHT
+            # 负载均衡算法属性配置
+            props:
+              slave1: 1.5
+              slave2: 3
+          alg_round_robin:
+            # 负载均衡算法类型
+            type: ROUND_ROBIN
+          alg_random:
+            # 负载均衡算法类型
+            type: RANDOM
+    # 打印SQl
+    props:
+      sql-show: true

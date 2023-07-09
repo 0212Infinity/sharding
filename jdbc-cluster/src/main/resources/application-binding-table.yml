@@ -1,0 +1,115 @@
+server:
+  port: 8888
+# 应用名称
+spring:
+  application:
+    name: jdbc-cluster
+  # 开发环境设置
+  profiles:
+    active: dev
+  # 模式配置
+  shardingsphere:
+    mode:
+      type: Cluster
+      repository:
+        type: ZooKeeper
+        props:
+          namespace: governance
+          server-lists: localhost:6181
+          retryIntervalMilliseconds: 500
+          timeToLiveSeconds: 60
+    datasource:
+      # 真实数据源名称，多个数据源用逗号区分
+      names: server-user,server-order0,server-order1
+      server-user:
+        # 数据库连接池全类名
+        type: com.zaxxer.hikari.HikariDataSource
+        # 数据库驱动类名，以数据库连接池自身配置为准
+        driver-class-name: com.mysql.jdbc.Driver
+        # 数据库 URL 连接，以数据库连接池自身配置为准
+        jdbc-url: jdbc:mysql://192.168.218.142:3301/db_user
+        # 数据库用户名，以数据库连接池自身配置为准
+        username: root
+        # 数据库密码，以数据库连接池自身配置为准
+        password: 123456
+      server-order0:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        jdbc-url: jdbc:mysql://192.168.218.142:3310/db_order
+        username: root
+        password: 123456
+      server-order1:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        jdbc-url: jdbc:mysql://192.168.218.142:3311/db_order
+        username: root
+        password: 123456
+    rules:
+      # 标准分片表配置
+      sharding:
+        tables:
+          t_user:
+            # 由数据源名 + 表名组成，以小数点分隔。多个表以逗号分隔，支持 inline 表达式。
+            # 缺省表示使用已知数据源与逻辑表名称生成数据节点，用于广播表（即每个库中都需要一个同样的表用于关联查询，多为字典表）或只分库不分表且所有库的表结构完全一致的情况
+            actual-data-nodes: server-user.t_user
+          t_order:
+            actual-data-nodes: server-order$->{0..1}.t_order$->{0..1}
+            # 分库策略
+            database-strategy:
+              standard:
+                sharding-column: user_id
+                sharding-algorithm-name: alg_mod
+            # 分表策略
+            table-strategy:
+              standard:
+                # 分片列名称
+                sharding-column: order_no
+                # 分片算法名称
+                sharding-algorithm-name: alg_hash_mod
+            # 分布式序列策略配置
+            key-generate-strategy:
+              column: id
+              key-generator-name: alg_snowflake
+          t_order_item:
+            actual-data-nodes: server-order$->{0..1}.t_order_item$->{0..1}
+            # 分库策略
+            database-strategy:
+              standard:
+                sharding-column: user_id
+                sharding-algorithm-name: alg_mod
+            # 分表策略
+            table-strategy:
+              standard:
+                # 分片列名称
+                sharding-column: order_no
+                # 分片算法名称
+                sharding-algorithm-name: alg_hash_mod
+            # 分布式序列策略配置
+            key-generate-strategy:
+              column: id
+              key-generator-name: alg_snowflake
+        # 分片算法配置
+        sharding-algorithms:
+          alg_mod:
+            # 取模分片算法
+            type: MOD
+            props:
+              # 分片数量
+              sharding-count: 2
+          alg_hash_mod:
+            # 哈希取模分片算法
+            type: HASH_MOD
+            props:
+              # 分片数量
+              sharding-count: 2
+        # 分布式序列算法配置
+        key-generators:
+          alg_snowflake:
+            # 雪花算法
+            type: SNOWFLAKE
+        # 绑定表规则列表
+        binding-tables:
+          - t_order,t_order_item
+    # 打印SQl
+    props:
+      sql-show: true
