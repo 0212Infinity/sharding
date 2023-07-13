@@ -1,4 +1,4 @@
-package com.example.jdbccluster.entity;
+package com.example.proxy.entity;
 
 import lombok.Data;
 

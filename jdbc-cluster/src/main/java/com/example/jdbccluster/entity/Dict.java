@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author Yu
  */
 @TableName("t_dict")
 @Data
-public class Dict {
+public class Dict implements Serializable {
     /**
      * 可以使用MyBatisPlus的雪花算法
      */

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -12,7 +13,7 @@ import java.math.BigDecimal;
  */
 @TableName("t_order")
 @Data
-public class Order {
+public class Order implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
     private String orderNo;

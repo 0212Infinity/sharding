@@ -1,0 +1,26 @@
+server:
+  port: 9898
+
+spring:
+  application:
+    # 应用名称
+    name: proxy
+  # mysql数据库连接（proxy）
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.218.142:13308/sharding_db?serverTimezone=UTC&useSSL=false
+    username: root
+    password: 123456
+
+# mybatis日志
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  loggers:
+  - loggerName: ShardingSphere-SQL
+    additivity: true
+    level: INFO
+    props:
+      enable: true

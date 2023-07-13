@@ -7,6 +7,7 @@
     <version>1.0.0</version>
     <modules>
         <module>jdbc-cluster</module>
+        <module>proxy</module>
     </modules>
     <name>sharding</name>
     <description>sharding</description>

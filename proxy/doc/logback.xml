@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="fileLog"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <!--<OnMatch>DENY</OnMatch>-->   <!-- 不匹配该级别及以上 -->
+            <!--<onMismatch>ACCEPT</onMismatch>--><!--匹配该级别及以下  -->
+        </filter>
+        <encoder>
+            <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+        <!-- 滚动策略 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 路径 -->
+            <fileNamePattern>/opt/shardingsphere-proxy/logs/out.%d.log</fileNamePattern>
+            <!--最多保留day天log -->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="org.apache.shardingsphere" level="info" additivity="false">
+        <appender-ref ref="console"/>
+        <appender-ref ref="fileLog"/>
+    </logger>
+
+    <logger name="com.zaxxer.hikari" level="error"/>
+
+    <logger name="com.atomikos" level="error"/>
+
+    <logger name="io.netty" level="error"/>
+
+    <root level="info">
+        <level value="info"/>
+        <appender-ref ref="console"/>
+        <appender-ref ref="fileLog"/>
+    </root>
+</configuration>

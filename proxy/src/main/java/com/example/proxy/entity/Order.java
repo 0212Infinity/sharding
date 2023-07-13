@@ -1,4 +1,4 @@
-package com.example.jdbccluster.entity;
+package com.example.proxy.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -6,14 +6,17 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * @author Yu
  */
-@TableName("t_user")
+@TableName("t_order")
 @Data
-public class User implements Serializable {
+public class Order implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private String uname;
+    private String orderNo;
+    private Long userId;
+    private BigDecimal amount;
 }

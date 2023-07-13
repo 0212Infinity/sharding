@@ -1,4 +1,4 @@
-package com.example.jdbccluster.entity;
+package com.example.proxy.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

@@ -1,0 +1,29 @@
+databaseName: sharding_db
+
+dataSources:
+  server-user:
+    url: jdbc:mysql://192.168.218.142:3301/db_user?serverTimezone=UTC&useSSL=false
+    username: root
+    password: 123456
+    connectionTimeoutMilliseconds: 30000
+    idleTimeoutMilliseconds: 60000
+    maxLifetimeMilliseconds: 1800000
+    maxPoolSize: 50
+    minPoolSize: 1
+  server-order:
+    url: jdbc:mysql://192.168.218.142:3302/db_order?serverTimezone=UTC&useSSL=false
+    username: root
+    password: 123456
+    connectionTimeoutMilliseconds: 30000
+    idleTimeoutMilliseconds: 60000
+    maxLifetimeMilliseconds: 1800000
+    maxPoolSize: 50
+    minPoolSize: 1
+
+rules:
+- !SHARDING
+  tables:
+    t_user:
+      actualDataNodes: server-user.t_user
+    t_order:
+      actualDataNodes: server-order.t_order
