@@ -10,6 +10,6 @@
 
 <h2>Doc</h2>
 
-[jdbc-cluster](../jdbc-cluster/README.md)
+[jdbc-cluster](./jdbc-cluster/README.md)
 
-[proxy](../proxy/README.md)
+[proxy](./proxy/README.md)
