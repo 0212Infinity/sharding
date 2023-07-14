@@ -1,0 +1,98 @@
+databaseName: sharding_db
+
+dataSources:
+  server-user:
+    url: jdbc:mysql://192.168.218.142:3301/db_user?serverTimezone=UTC&useSSL=false
+    username: root
+    password: 123456
+    connectionTimeoutMilliseconds: 30000
+    idleTimeoutMilliseconds: 60000
+    maxLifetimeMilliseconds: 1800000
+    maxPoolSize: 50
+    minPoolSize: 1
+  server-order0:
+    url: jdbc:mysql://192.168.218.142:3310/db_order?serverTimezone=UTC&useSSL=false
+    username: root
+    password: 123456
+    connectionTimeoutMilliseconds: 30000
+    idleTimeoutMilliseconds: 60000
+    maxLifetimeMilliseconds: 1800000
+    maxPoolSize: 50
+    minPoolSize: 1
+  server-order1:
+    url: jdbc:mysql://192.168.218.142:3311/db_order?serverTimezone=UTC&useSSL=false
+    username: root
+    password: 123456
+    connectionTimeoutMilliseconds: 30000
+    idleTimeoutMilliseconds: 60000
+    maxLifetimeMilliseconds: 1800000
+    maxPoolSize: 50
+    minPoolSize: 1
+
+rules:
+- !SHARDING
+  tables:
+    t_user:
+      actualDataNodes: server-user.t_user
+    t_order:
+      actualDataNodes: server-order${0..1}.t_order${0..1}
+      # 分库策略
+      databaseStrategy:
+        standard:
+          # 分片列名称
+          shardingColumn: user_id
+          # 分片算法名称
+          shardingAlgorithmName: alg_database_inline_userid
+      # 分表策略
+      tableStrategy:
+        standard:
+          shardingColumn: order_no
+          shardingAlgorithmName: alg_order_inline_order_no
+      # 分布式序列策略
+      keyGenerateStrategy:
+        # 自增列名称
+        column: id
+        # 分布式序列算法名称
+        keyGeneratorName: alg_snowflake
+    t_order_item:
+      actualDataNodes: server-order${0..1}.t_order_item${0..1}
+      databaseStrategy:
+        standard:
+          shardingColumn: user_id
+          shardingAlgorithmName: alg_database_inline_userid
+      tableStrategy:
+        standard:
+          shardingColumn: order_no
+          shardingAlgorithmName: alg_order_item_inline_order_no
+      keyGenerateStrategy:
+        column: id
+        keyGeneratorName: alg_snowflake
+  # 分片算法配置
+  shardingAlgorithms:
+    # 分片算法名称
+    alg_database_inline_userid:
+      # 分片算法类型
+      type: INLINE
+      # 分片算法属性配置
+      props:
+        algorithm-expression: server-order${user_id % 2}
+    alg_order_inline_order_no:
+      type: INLINE
+      props:
+        algorithm-expression: t_order${(order_no - 'DINGDANHAO').toInteger() % 2}
+    alg_order_item_inline_order_no:
+      type: INLINE
+      props:
+        algorithm-expression: t_order_item${(order_no - 'DINGDANHAO').toInteger() % 2}
+  # 分布式序列算法配置
+  keyGenerators:
+    # 分布式序列算法名称
+    alg_snowflake:
+      # 分布式序列算法类型
+      type: SNOWFLAKE
+  # 绑定表规则列表
+  bindingTables:
+    - t_order,t_order_item
+- !BROADCAST
+  tables: # 广播表规则列表
+    - t_dict

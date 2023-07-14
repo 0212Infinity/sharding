@@ -1,10 +1,8 @@
 package com.example.proxy;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.example.proxy.entity.Order;
-import com.example.proxy.entity.OrderItem;
-import com.example.proxy.entity.OrderVo;
-import com.example.proxy.entity.User;
+import com.example.proxy.entity.*;
+import com.example.proxy.mapper.DictMapper;
 import com.example.proxy.mapper.OrderItemMapper;
 import com.example.proxy.mapper.OrderMapper;
 import com.example.proxy.mapper.UserMapper;
@@ -26,6 +24,9 @@ public class ShardingProxyApplicationTests {
 
     @Autowired
     private OrderItemMapper orderItemMapper;
+
+    @Autowired
+    private DictMapper dictMapper;
 
     /**
      * 读写分离-读数据测试
@@ -150,5 +151,30 @@ public class ShardingProxyApplicationTests {
     public void testGetOrderAmount() {
         List<OrderVo> orderAmountList = orderMapper.getOrderAmount();
         orderAmountList.forEach(System.out::println);
+    }
+
+    /**
+     * 广播表：插入测试
+     */
+    @Test
+    public void testInsertBroadcast() {
+        Dict dict = new Dict();
+        dict.setDictType("type1");
+        dictMapper.insert(dict);
+    }
+
+    /**
+     * 查询操作
+     * 随机负载均衡规则
+     */
+    @Test
+    public void testSelectBroadcast() {
+        List<Dict> dictList = dictMapper.selectList(null);
+        dictMapper.selectList(null);
+        dictMapper.selectList(null);
+        dictMapper.selectList(null);
+        dictMapper.selectList(null);
+        dictMapper.selectList(null);
+        dictList.forEach(System.out::println);
     }
 }
