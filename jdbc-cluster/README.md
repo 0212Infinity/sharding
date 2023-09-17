@@ -108,6 +108,7 @@ docker run -d \
 -v /sharding/mysql/slave1/data:/var/lib/mysql \
 -e MYSQL_ROOT_PASSWORD=123456 \
 --name sharding-mysql-slave1 \
+--link sharding-mysql-master:master \
 mysql:8.0.29
 ```
 ```shell
@@ -133,7 +134,7 @@ ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
 ```
 ```sql
 --  MASTER IP
-CHANGE MASTER TO MASTER_HOST='192.168.218.142', 
+CHANGE MASTER TO MASTER_HOST='master', 
 -- MASTER 中创建的slave用户
 MASTER_USER='sharding_slave',MASTER_PASSWORD='123456', MASTER_PORT=3306,
 -- MASTER 执行 SHOW MASTER STATUS; 获取
@@ -147,6 +148,7 @@ docker run -d \
 -v /sharding/mysql/slave2/data:/var/lib/mysql \
 -e MYSQL_ROOT_PASSWORD=123456 \
 --name sharding-mysql-slave2 \
+--link sharding-mysql-master:master \
 mysql:8.0.29
 ```
 ```shell
@@ -172,7 +174,7 @@ ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
 ```
 ```sql
 --  MASTER IP
-CHANGE MASTER TO MASTER_HOST='192.168.218.142', 
+CHANGE MASTER TO MASTER_HOST='master', 
 -- MASTER 中创建的slave用户
 MASTER_USER='sharding_slave',MASTER_PASSWORD='123456', MASTER_PORT=3306,
 -- MASTER 执行 SHOW MASTER STATUS; 获取
